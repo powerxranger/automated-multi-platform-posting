@@ -379,11 +379,11 @@ The suite makes **no network calls** — `httpx.MockTransport` stands in for eve
 
 | Area | What is asserted |
 |---|---|
-| Validation (24 tests) | 200 vs 201 chars, 0 / 1 / 2 links, duplicate links, `ftp://`, localhost, private IPs, missing TLD, embedded credentials, bad port, trailing punctuation, unicode, whitespace normalisation, title derivation |
-| Orchestration (17) | all succeed, **one fails and the rest still publish**, all fail, unavailable platforms, `ENABLED_PLATFORMS`, retryable vs non-retryable errors, retry counting, timeout isolation, real parallelism (timing), idempotency replay, public-access verification |
-| Adapters (25) | request payload shape per platform (including Bluesky's UTF-8 byte offsets), URL construction, 401/403/404/422/429/500 mapping, `Retry-After`, network timeouts, non-JSON responses, Telegram `ok:false`, Reddit token caching |
-| HTTP contract (23) | status codes, error envelope shape, `extra_forbidden`, malformed JSON, `X-Request-ID` echo, 404 envelope, OpenAPI content, no credentials in responses |
-| Security / OAuth1 (13) | token redaction in logs, errors and API output; HMAC-SHA1 header structure and determinism |
+| Validation (25 tests) | 200 vs 201 chars, 0 / 1 / 2 links, duplicate links, `ftp://`, localhost, private IPs, missing TLD, embedded credentials, bad port, trailing punctuation, unicode, whitespace normalisation, title derivation |
+| Orchestration (16) | all succeed, **one fails and the rest still publish**, all fail, unavailable platforms, `ENABLED_PLATFORMS`, retryable vs non-retryable errors, retry counting, timeout isolation, real parallelism (timing), idempotency replay, public-access verification |
+| Adapters (24) | request payload shape per platform (including Bluesky's UTF-8 byte offsets), URL construction, 401/403/404/422/429/500 mapping, `Retry-After`, network timeouts, non-JSON responses, Telegram `ok:false`, Reddit token caching |
+| HTTP contract (22) | status codes, error envelope shape, `extra_forbidden`, malformed JSON, `X-Request-ID` echo, 404 envelope, OpenAPI content, no credentials in responses |
+| Security / OAuth1 (9) | token redaction in logs, errors and API output; HMAC-SHA1 header structure and determinism |
 
 CI runs `ruff check`, `ruff format --check`, `mypy app` and the suite with
 `--cov-fail-under=90` on Python 3.11 and 3.12.
