@@ -1,0 +1,141 @@
+{
+  "success": true,
+  "request_id": "0f9c2f0f4b6a4d7e9c1a2b3c4d5e6f70",
+  "message": "Check out our latest business platform and grow your online visibility. https://example.com",
+  "summary": {
+    "total": 7,
+    "succeeded": 6,
+    "failed": 1,
+    "duration_ms": 514,
+    "platforms_unavailable": []
+  },
+  "results": [
+    {
+      "platform": "Bluesky",
+      "status": "success",
+      "posted_url": "https://bsky.app/profile/demo.bsky.social/post/3kexample",
+      "public_access": true,
+      "date": "2026-11-16",
+      "time": "19:29:58",
+      "error": null,
+      "meta": {
+        "http_status": 201,
+        "latency_ms": 201,
+        "attempts": 1,
+        "public_access_verified": true,
+        "timezone": "Asia/Kolkata",
+        "post_id": "bluesky",
+        "checked_at_utc": "2026-11-16T13:59:58+00:00"
+      }
+    },
+    {
+      "platform": "Mastodon",
+      "status": "success",
+      "posted_url": "https://mastodon.social/@demo/113000000000000001",
+      "public_access": true,
+      "date": "2026-11-16",
+      "time": "19:29:59",
+      "error": null,
+      "meta": {
+        "http_status": 201,
+        "latency_ms": 294,
+        "attempts": 1,
+        "public_access_verified": true,
+        "timezone": "Asia/Kolkata",
+        "post_id": "mastodon",
+        "checked_at_utc": "2026-11-16T13:59:59+00:00"
+      }
+    },
+    {
+      "platform": "Telegram",
+      "status": "success",
+      "posted_url": "https://t.me/demo_channel/42",
+      "public_access": true,
+      "date": "2026-11-16",
+      "time": "19:29:58",
+      "error": null,
+      "meta": {
+        "http_status": 201,
+        "latency_ms": 170,
+        "attempts": 1,
+        "public_access_verified": true,
+        "timezone": "Asia/Kolkata",
+        "post_id": "telegram",
+        "checked_at_utc": "2026-11-16T13:59:58+00:00"
+      }
+    },
+    {
+      "platform": "Dev.to",
+      "status": "success",
+      "posted_url": "https://dev.to/demo/grow-your-online-visibility-3f1a",
+      "public_access": true,
+      "date": "2026-11-16",
+      "time": "19:29:59",
+      "error": null,
+      "meta": {
+        "http_status": 201,
+        "latency_ms": 421,
+        "attempts": 1,
+        "public_access_verified": true,
+        "timezone": "Asia/Kolkata",
+        "post_id": "devto",
+        "checked_at_utc": "2026-11-16T13:59:59+00:00"
+      }
+    },
+    {
+      "platform": "GitHub Gist",
+      "status": "success",
+      "posted_url": "https://gist.github.com/demo/0123456789abcdef",
+      "public_access": true,
+      "date": "2026-11-16",
+      "time": "19:29:58",
+      "error": null,
+      "meta": {
+        "http_status": 201,
+        "latency_ms": 201,
+        "attempts": 1,
+        "public_access_verified": true,
+        "timezone": "Asia/Kolkata",
+        "post_id": "gist",
+        "checked_at_utc": "2026-11-16T13:59:58+00:00"
+      }
+    },
+    {
+      "platform": "LinkedIn",
+      "status": "success",
+      "posted_url": "https://www.linkedin.com/feed/update/urn:li:share:7123456789/",
+      "public_access": true,
+      "date": "2026-11-16",
+      "time": "19:29:59",
+      "error": null,
+      "meta": {
+        "http_status": 201,
+        "latency_ms": 513,
+        "attempts": 1,
+        "public_access_verified": false,
+        "timezone": "Asia/Kolkata",
+        "post_id": "linkedin",
+        "checked_at_utc": "2026-11-16T13:59:59+00:00"
+      }
+    },
+    {
+      "platform": "X (Twitter)",
+      "status": "failed",
+      "posted_url": null,
+      "public_access": false,
+      "date": null,
+      "time": null,
+      "error": "Authentication failed",
+      "meta": {
+        "http_status": null,
+        "latency_ms": 325,
+        "attempts": 1,
+        "public_access_verified": false,
+        "timezone": "Asia/Kolkata",
+        "post_id": null,
+        "checked_at_utc": null
+      }
+    }
+  ],
+  "replayed": false
+}

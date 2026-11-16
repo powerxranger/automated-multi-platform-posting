@@ -1,0 +1,62 @@
+### Health check
+GET http://localhost:4000/health
+
+### Platform readiness (which credentials are present)
+GET http://localhost:4000/platforms
+
+### Validate a message without publishing
+POST http://localhost:4000/validate
+Content-Type: application/json
+
+{
+  "message": "Check out our latest business platform and grow your online visibility. https://example.com"
+}
+
+### Publish to every configured platform
+POST http://localhost:4000/posting
+Content-Type: application/json
+
+{
+  "message": "Check out our latest business platform and grow your online visibility. https://example.com"
+}
+
+### Publish with an idempotency key (retrying this call will not post twice)
+POST http://localhost:4000/posting
+Content-Type: application/json
+Idempotency-Key: demo-001
+
+{
+  "message": "Shipping our new dashboard today. https://example.com/dashboard"
+}
+
+### Validation error: more than 200 characters
+POST http://localhost:4000/posting
+Content-Type: application/json
+
+{
+  "message": "This message is far too long for the API to accept and it keeps going and going and going well past the two hundred character limit so the request must be rejected with a helpful validation error and no network calls. https://example.com"
+}
+
+### Validation error: no CTA link
+POST http://localhost:4000/posting
+Content-Type: application/json
+
+{
+  "message": "No link in this message"
+}
+
+### Validation error: two CTA links
+POST http://localhost:4000/posting
+Content-Type: application/json
+
+{
+  "message": "Two links https://example.com and https://example.org"
+}
+
+### Validation error: non-public URL
+POST http://localhost:4000/posting
+Content-Type: application/json
+
+{
+  "message": "Only local for now http://localhost:4000/dashboard"
+}

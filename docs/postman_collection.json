@@ -1,0 +1,170 @@
+{
+  "info": {
+    "name": "Automated Multi-Platform Posting",
+    "description": "Postman collection for the FastAPI service. Start the server on port 4000, then run the requests in order.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4000"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/health",
+          "host": ["{{baseUrl}}"],
+          "path": ["health"]
+        }
+      }
+    },
+    {
+      "name": "Platform readiness",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/platforms",
+          "host": ["{{baseUrl}}"],
+          "path": ["platforms"]
+        }
+      }
+    },
+    {
+      "name": "Validate message",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"Check out our latest business platform and grow your online visibility. https://example.com\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/validate",
+          "host": ["{{baseUrl}}"],
+          "path": ["validate"]
+        }
+      }
+    },
+    {
+      "name": "Publish",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Idempotency-Key",
+            "value": "demo-001",
+            "description": "Optional. Repeating the same key within 10 minutes returns the cached response."
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"Check out our latest business platform and grow your online visibility. https://example.com\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/posting",
+          "host": ["{{baseUrl}}"],
+          "path": ["posting"]
+        }
+      }
+    },
+    {
+      "name": "Publish - invalid (two links)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"Two links https://example.com and https://example.org\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/posting",
+          "host": ["{{baseUrl}}"],
+          "path": ["posting"]
+        }
+      }
+    },
+    {
+      "name": "Publish - invalid (too long)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"This message is intentionally far too long for the API to accept and it continues past the two hundred character limit so the request has to be rejected with a helpful validation error and no platform call is made. https://example.com\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/posting",
+          "host": ["{{baseUrl}}"],
+          "path": ["posting"]
+        }
+      }
+    },
+    {
+      "name": "Publish - invalid (no link)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"No link in this message\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/posting",
+          "host": ["{{baseUrl}}"],
+          "path": ["posting"]
+        }
+      }
+    },
+    {
+      "name": "Publish - invalid (private URL)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"message\": \"Only local for now http://localhost:4000/dashboard\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/posting",
+          "host": ["{{baseUrl}}"],
+          "path": ["posting"]
+        }
+      }
+    }
+  ]
+}
