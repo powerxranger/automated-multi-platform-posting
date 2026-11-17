@@ -32,7 +32,7 @@ pip install -r requirements.txt
 cp .env.example .env            # Windows: Copy-Item .env.example .env
 ```
 
-Fill in the five sets of credentials in `.env`, then start the server:
+Fill in the credentials for the five integrations in `.env` — GitHub Issues and Gist can share one token — then start the server:
 
 ```bash
 uvicorn app.main:app --host 0.0.0.0 --port 4000
@@ -55,6 +55,35 @@ Docker is there too if you prefer it: `docker compose up --build`.
 
 ---
 
+## How to test it
+
+First check that the server is up and that all five adapters are configured:
+
+```bash
+curl http://localhost:4000/health
+curl http://localhost:4000/platforms
+```
+
+Then publish a real message:
+
+```bash
+curl -X POST http://localhost:4000/posting \
+  -H "Content-Type: application/json" \
+  -d "{\"message\":\"Check out our latest business platform and grow your online visibility. https://example.com\"}"
+```
+
+If you only want to check the validation rules without publishing:
+
+```bash
+curl -X POST http://localhost:4000/validate \
+  -H "Content-Type: application/json" \
+  -d "{\"message\":\"Check out our latest business platform and grow your online visibility. https://example.com\"}"
+```
+
+The response shows one row per platform with its status, public URL and any error. Invalid messages return `422` with the exact rule that failed.
+
+---
+
 ## What the endpoint actually does
 
 - Trims the message and counts characters. The limit is 200.
@@ -66,7 +95,7 @@ Docker is there too if you prefer it: `docker compose up --build`.
 - Returns one row per platform with `platform`, `status`, `posted_url`, `public_access`, `date`, `time` and `error`.
 - Verifies `public_access` with an anonymous GET after publishing. It is not just set to `true` because the API call returned `200`.
 
-The five integrations are **Bluesky, Mastodon, Telegram, GitHub Issues and GitHub Gist**. I picked these because all five can publish text and give back a public URL without an app review or a paid plan. GitHub Issues and Gists are separate products with separate APIs and URL shapes, even though they share one token.
+The five integrations are **Bluesky, Mastodon, Telegram, GitHub Issues and GitHub Gist**. I picked these because all five can publish text and give back a public URL without an app review or a paid plan. GitHub Issues and Gists are separate products with separate APIs and URL shapes; they can use the same token or separate tokens.
 
 If no credentials are configured, the endpoint returns `503 NO_PLATFORMS_CONFIGURED` and lists what is missing. It never invents a success.
 
@@ -244,7 +273,21 @@ $ curl -s -X POST http://localhost:4000/posting -H "Content-Type: application/js
           "message":"No platform is configured. Fill in at least one set of credentials in .env (see .env.example) and restart the server."}}
 ```
 
-More ready-to-run requests: [`requests.http`](requests.http) and [`docs/postman_collection.json`](docs/postman_collection.json). The screenshot checklist is in [`docs/screenshots/README.md`](docs/screenshots/README.md).
+More ready-to-run requests: [`requests.http`](requests.http) and [`docs/postman_collection.json`](docs/postman_collection.json).
+
+Screenshots:
+
+1. [Swagger with `POST /posting`](docs/screenshots/01-swagger.png)
+2. [All five adapters configured](docs/screenshots/02-platforms.png)
+3. [Real `200` posting response](docs/screenshots/03-posting-response.png)
+4. [Published Bluesky post](docs/screenshots/04-bluesky.png)
+5. [Published Mastodon post](docs/screenshots/05-mastodon.png)
+6. [Published Telegram message](docs/screenshots/06-telegram.png)
+7. [Public GitHub issue](docs/screenshots/07-github-issue.png)
+8. [Public GitHub gist](docs/screenshots/08-gist.png)
+9. [Tests and coverage](docs/screenshots/09-tests.png)
+
+The checklist is in [`docs/screenshots/README.md`](docs/screenshots/README.md).
 
 ---
 
