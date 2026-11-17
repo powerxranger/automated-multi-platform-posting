@@ -14,9 +14,9 @@ Screenshots and captured logs that prove the integrations are real belong here.
 | `06-telegram.png` | The published message in the public channel |
 | `07-github-issue.png` | The public GitHub issue |
 | `08-gist.png` | The public gist |
-| `09-partial-failure.png` | *(Optional)* One platform deliberately misconfigured, others still succeeding |
-| `10-tests.png` | `pytest --cov=app` output (all green, coverage percentage visible) |
-| `11-ci.png` | Green GitHub Actions run |
+| `09-tests.png` | `pytest --cov=app` output (all green, coverage percentage visible) |
+
+CI is evidenced by the green badge and GitHub Actions run linked in the main README. A partial-failure screenshot is not included in this final set.
 
 ## Rules
 
