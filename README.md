@@ -5,7 +5,7 @@ Built for the Dxora Technologies practical test.
 I built this around one small request: `POST /posting` with a message. The service checks the message once, then posts it to five platforms. If one account is broken, the other four still go out. That was the part I cared about most, no fake "all succeeded" responses.
 
 [![ci](https://github.com/powerxranger/automated-multi-platform-posting/actions/workflows/ci.yml/badge.svg)](https://github.com/powerxranger/automated-multi-platform-posting/actions/workflows/ci.yml)
-![tests](https://img.shields.io/badge/tests-99%20passing-success)
+![tests](https://img.shields.io/badge/tests-101%20passing-success)
 ![coverage](https://img.shields.io/badge/coverage-93%25-success)
 ![license](https://img.shields.io/badge/license-MIT-blue)
 
@@ -129,7 +129,7 @@ Short version of each:
 1. **Bluesky** — bsky.app → *Settings* → *App Passwords* → add one. Use an app password, not your account password. No approval needed.
 2. **Mastodon** — *Preferences* → *Development* → *New application*, scope `write:statuses`. Put the exact instance URL with `https://` in `MASTODON_INSTANCE_URL`.
 3. **Telegram** — `@BotFather` → `/newbot`. Make a **public** channel with a username, then add the bot as an administrator with *Post Messages*. `TELEGRAM_CHANNEL` accepts `@name`, `name` or `https://t.me/name`.
-4. **Dev.to** — *Settings* → *Extensions* → *DEV Community API Keys* → generate. Each article needs a unique CTA link because it is sent as the canonical URL.
+4. **Dev.to** — *Settings* → *Extensions* → *DEV Community API Keys* → generate. Each article needs a unique CTA link because it is sent as the canonical URL. The adapter checks the article after creation and force-publishes it if DEV.to quietly saves it as a draft.
 5. **GitHub Gist** — *Settings* → *Developer settings* → *Personal access tokens* → **fine-grained**, with **Account permissions → Gists: read and write**.
 
 I did not add more platforms for the sake of a bigger number. Medium shut down its public write API; Threads, Pinterest and Facebook need app review; Slack and Discord posts are not publicly readable; Buffer and Ayrshare are aggregators, not direct integrations.
@@ -256,15 +256,15 @@ pytest --cov=app --cov-report=term-missing
 ```
 
 ```
-99 passed
-TOTAL   832 statements   38 missed   93% coverage
+101 passed
+TOTAL   867 statements   42 missed   93% coverage
 ```
 
 The suite makes no network calls. `httpx.MockTransport` stands in for every API.
 
 - **Validation (25):** 200 vs 201 characters, zero/one/two links, duplicate links, `ftp://`, localhost, private IPs, missing TLD, embedded credentials, bad port, trailing punctuation, unicode, title derivation.
 - **Orchestration (16):** all succeed, one fails while the rest still publish, all fail, unavailable platforms, `ENABLED_PLATFORMS`, retryable vs non-retryable errors, retry counting, timeout isolation, real parallelism, idempotency replay, public-access verification.
-- **Adapters (25):** request payload shape per platform, including Bluesky's UTF-8 byte offsets, URL construction, `401/403/404/422/429/500` mapping, `Retry-After`, timeouts, non-JSON replies, Telegram `ok:false` and `t.me/` URLs.
+- **Adapters (27):** request payload shape per platform, including Bluesky's UTF-8 byte offsets, URL construction, `401/403/404/422/429/500` mapping, `Retry-After`, timeouts, non-JSON replies, Telegram `ok:false` and `t.me/` URLs, and the Dev.to draft → force-publish → public-URL check.
 - **HTTP contract (22):** status codes, error envelope, `extra_forbidden`, malformed JSON, `X-Request-ID` echo, 404 envelope, OpenAPI content, no credentials in responses.
 - **Security and public access (11):** token redaction in logs, errors and responses; anonymous GET login-wall detection.
 

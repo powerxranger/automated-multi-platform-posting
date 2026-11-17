@@ -161,18 +161,70 @@ async def test_telegram_accepts_a_t_me_url_in_settings(
 async def test_devto_sends_title_and_canonical_url(
     settings: Settings, message: ParsedMessage
 ) -> None:
-    client, calls = recording(
-        lambda request: httpx.Response(201, json={"id": 1, "url": "https://dev.to/tester/post-abc"})
-    )
+    public_url = "https://dev.to/tester/post-abc"
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.method == "POST":
+            return httpx.Response(201, json={"id": 1, "url": public_url})
+        if request.url.path == "/api/articles/1":
+            return httpx.Response(200, json={"id": 1, "url": public_url, "published": True})
+        return httpx.Response(200, text="<html>Published article</html>")
+
+    client, calls = recording(handler)
     outcome = await DevToAdapter(settings, client).publish_once(message)
 
-    assert outcome.posted_url == "https://dev.to/tester/post-abc"
+    assert outcome.posted_url == public_url
     import json
 
     article = json.loads(calls[0].content)["article"]
     assert article["canonical_url"] == message.url
     assert article["title"] == message.title
     assert article["published"] is True
+
+
+async def test_devto_force_publishes_a_draft(settings: Settings, message: ParsedMessage) -> None:
+    public_url = "https://dev.to/tester/post-draft"
+    state = {"published": False}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.method == "POST":
+            return httpx.Response(201, json={"id": 7, "url": public_url})
+        if request.method == "PUT":
+            state["published"] = True
+            return httpx.Response(200, json={"id": 7})
+        if request.url.path == "/api/articles/7":
+            return httpx.Response(
+                200, json={"id": 7, "url": public_url, "published": state["published"]}
+            )
+        return httpx.Response(200, text="<html>Published article</html>")
+
+    client, calls = recording(handler)
+    outcome = await DevToAdapter(settings, client).publish_once(message)
+
+    assert outcome.posted_url == public_url
+    put_calls = [call for call in calls if call.method == "PUT"]
+    assert len(put_calls) == 1
+    import json
+
+    assert json.loads(put_calls[0].content)["article"]["published"] is True
+
+
+async def test_devto_rejects_an_article_that_is_not_public(
+    settings: Settings, message: ParsedMessage
+) -> None:
+    public_url = "https://dev.to/tester/post-missing"
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        if request.method == "POST":
+            return httpx.Response(201, json={"id": 9, "url": public_url})
+        if request.url.path == "/api/articles/9":
+            return httpx.Response(200, json={"id": 9, "url": public_url, "published": True})
+        return httpx.Response(404, text="404: Page Not Found")
+
+    client = make_client(handler)
+    with pytest.raises(PlatformError) as caught:
+        await DevToAdapter(settings, client).publish_once(message)
+    assert caught.value.code is ErrorCode.UNEXPECTED
 
 
 # ------------------------------------------------------------------------ gist --
