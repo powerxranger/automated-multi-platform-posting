@@ -31,7 +31,7 @@ def build_settings(**overrides: Any) -> Settings:
         "mastodon_access_token": "mastodon-token-0123456789",
         "telegram_bot_token": "123456:telegram-token-0123456789",
         "telegram_channel": "@testchannel",
-        "devto_api_key": "devto-key-0123456789",
+        "github_issue_repo": "tester/repo",
         "github_token": "test-github-token-value",
     }
     defaults.update(overrides)

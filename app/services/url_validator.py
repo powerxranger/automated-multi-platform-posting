@@ -110,7 +110,7 @@ def url_problem(url: str) -> str | None:
 
 
 def derive_title(text: str, url: str, limit: int = 80) -> str:
-    """Build a short title for platforms that require one (currently Dev.to)."""
+    """Build a short title for platforms that require one (GitHub Issue)."""
     without_url = text.replace(url, " ").strip(" -:|,.;")
     without_url = re.sub(r"\s+", " ", without_url).strip()
     if not without_url:

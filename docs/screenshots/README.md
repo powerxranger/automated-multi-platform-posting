@@ -12,9 +12,9 @@ Screenshots and captured logs that prove the integrations are real belong here.
 | `04-bluesky.png` | The published Bluesky post open in a browser, URL bar visible |
 | `05-mastodon.png` | The published Mastodon status open in a browser |
 | `06-telegram.png` | The published message in the public channel |
-| `07-devto.png` | The published Dev.to article |
+| `07-github-issue.png` | The public GitHub issue |
 | `08-gist.png` | The public gist |
-| `09-partial-failure.png` | One platform deliberately misconfigured, others still succeeding |
+| `09-partial-failure.png` | *(Optional)* One platform deliberately misconfigured, others still succeeding |
 | `10-tests.png` | `pytest --cov=app` output (all green, coverage percentage visible) |
 | `11-ci.png` | Green GitHub Actions run |
 

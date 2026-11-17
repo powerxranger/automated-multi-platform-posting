@@ -1,103 +1,103 @@
 {
   "success": true,
-  "request_id": "0f055c3229f144498669f1fc63a3ad78",
-  "message": "Final five platform verification run https://example.com/final5-171510",
+  "request_id": "37be08950f2a4ea89e82789886aace50",
+  "message": "Final five platform run with GitHub Issues https://example.com/final5-github-issue-222644",
   "summary": {
     "total": 5,
     "succeeded": 5,
     "failed": 0,
-    "duration_ms": 2314,
+    "duration_ms": 2302,
     "platforms_unavailable": []
   },
   "results": [
     {
       "platform": "Bluesky",
       "status": "success",
-      "posted_url": "https://bsky.app/profile/aggarwalkrish28.bsky.social/post/3n2ixqpgxq22f",
+      "posted_url": "https://bsky.app/profile/aggarwalkrish28.bsky.social/post/3n2jj5tax732g",
       "public_access": true,
       "date": "2026-11-17",
-      "time": "17:15:12",
+      "time": "22:26:46",
       "error": null,
       "meta": {
         "http_status": 200,
-        "latency_ms": 2314,
+        "latency_ms": 2278,
         "attempts": 1,
         "public_access_verified": true,
         "timezone": "Asia/Kolkata",
-        "post_id": "at://did:plc:4vyinmsljzsvnyjq2awbkn2c/app.bsky.feed.post/3n2ixqpgxq22f",
-        "checked_at_utc": "2026-11-17T11:45:13+00:00"
+        "post_id": "at://did:plc:4vyinmsljzsvnyjq2awbkn2c/app.bsky.feed.post/3n2jj5tax732g",
+        "checked_at_utc": "2026-11-17T16:56:47+00:00"
       }
     },
     {
       "platform": "Mastodon",
       "status": "success",
-      "posted_url": "https://mastodon.social/@aggarwalkrish28/117631609179418319",
+      "posted_url": "https://mastodon.social/@aggarwalkrish28/117632834301725525",
       "public_access": true,
       "date": "2026-11-17",
-      "time": "17:15:11",
+      "time": "22:26:45",
       "error": null,
       "meta": {
         "http_status": 200,
-        "latency_ms": 1512,
+        "latency_ms": 1555,
         "attempts": 1,
         "public_access_verified": true,
         "timezone": "Asia/Kolkata",
-        "post_id": "117631609179418319",
-        "checked_at_utc": "2026-11-17T11:45:12+00:00"
+        "post_id": "117632834301725525",
+        "checked_at_utc": "2026-11-17T16:56:46+00:00"
       }
     },
     {
       "platform": "Telegram",
       "status": "success",
-      "posted_url": "https://t.me/aggarchannel/5",
-      "public_access": true,
+      "posted_url": "https://t.me/aggarchannel/10",
+      "public_access": null,
       "date": "2026-11-17",
-      "time": "17:15:11",
+      "time": "22:26:45",
       "error": null,
       "meta": {
         "http_status": 200,
-        "latency_ms": 1263,
+        "latency_ms": 1065,
         "attempts": 1,
-        "public_access_verified": true,
+        "public_access_verified": false,
         "timezone": "Asia/Kolkata",
-        "post_id": "5",
-        "checked_at_utc": "2026-11-17T11:45:12+00:00"
+        "post_id": "10",
+        "checked_at_utc": "2026-11-17T16:56:46+00:00"
       }
     },
     {
-      "platform": "Dev.to",
+      "platform": "GitHub Issue",
       "status": "success",
-      "posted_url": "https://dev.to/krish_aggarwal_6e08a24f75/final-five-platform-verification-run-2932",
+      "posted_url": "https://github.com/powerxranger/automated-multi-platform-posting/issues/1",
       "public_access": true,
       "date": "2026-11-17",
-      "time": "17:15:11",
+      "time": "22:26:45",
       "error": null,
       "meta": {
         "http_status": 201,
-        "latency_ms": 863,
+        "latency_ms": 1679,
         "attempts": 1,
         "public_access_verified": true,
         "timezone": "Asia/Kolkata",
-        "post_id": "5056864",
-        "checked_at_utc": "2026-11-17T11:45:11+00:00"
+        "post_id": "1",
+        "checked_at_utc": "2026-11-17T16:56:46+00:00"
       }
     },
     {
       "platform": "GitHub Gist",
       "status": "success",
-      "posted_url": "https://gist.github.com/powerxranger/efe18d15fc21cf8fcd905690bd452ae7",
+      "posted_url": "https://gist.github.com/powerxranger/78ee0992bef72b34aa784fed3bb15c16",
       "public_access": true,
       "date": "2026-11-17",
-      "time": "17:15:12",
+      "time": "22:26:46",
       "error": null,
       "meta": {
         "http_status": 201,
-        "latency_ms": 2173,
+        "latency_ms": 2295,
         "attempts": 1,
         "public_access_verified": true,
         "timezone": "Asia/Kolkata",
-        "post_id": "efe18d15fc21cf8fcd905690bd452ae7",
-        "checked_at_utc": "2026-11-17T11:45:13+00:00"
+        "post_id": "78ee0992bef72b34aa784fed3bb15c16",
+        "checked_at_utc": "2026-11-17T16:56:47+00:00"
       }
     }
   ],

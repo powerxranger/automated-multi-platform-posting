@@ -16,7 +16,7 @@ PLATFORM_IDS: tuple[str, ...] = (
     "bluesky",
     "mastodon",
     "telegram",
-    "devto",
+    "github_issue",
     "gist",
 )
 
@@ -71,9 +71,11 @@ class Settings(BaseSettings):
     telegram_bot_token: str | None = None
     telegram_channel: str | None = None
 
-    # ---------------------------------------------------------------- devto --
-    devto_api_key: str | None = None
-    devto_tags: str = ""
+    # --------------------------------------------------------- github issue --
+    # Optional separate token. Falls back to GITHUB_TOKEN when unset, so the
+    # Issues write permission can be granted without widening the Gist token.
+    github_issue_token: str | None = None
+    github_issue_repo: str = "powerxranger/automated-multi-platform-posting"
 
     # ----------------------------------------------------------------- gist --
     github_token: str | None = None
@@ -99,8 +101,8 @@ class Settings(BaseSettings):
             self.bluesky_app_password,
             self.mastodon_access_token,
             self.telegram_bot_token,
-            self.devto_api_key,
             self.github_token,
+            self.github_issue_token,
         ]
         return [value for value in candidates if value and len(value) >= 6]
 

@@ -5,8 +5,8 @@ Built for the Dxora Technologies practical test.
 I built this around one small request: `POST /posting` with a message. The service checks the message once, then posts it to five platforms. If one account is broken, the other four still go out. That was the part I cared about most, no fake "all succeeded" responses.
 
 [![ci](https://github.com/powerxranger/automated-multi-platform-posting/actions/workflows/ci.yml/badge.svg)](https://github.com/powerxranger/automated-multi-platform-posting/actions/workflows/ci.yml)
-![tests](https://img.shields.io/badge/tests-101%20passing-success)
-![coverage](https://img.shields.io/badge/coverage-93%25-success)
+![tests](https://img.shields.io/badge/tests-102%20passing-success)
+![coverage](https://img.shields.io/badge/coverage-94%25-success)
 ![license](https://img.shields.io/badge/license-MIT-blue)
 
 ```
@@ -66,7 +66,7 @@ Docker is there too if you prefer it: `docker compose up --build`.
 - Returns one row per platform with `platform`, `status`, `posted_url`, `public_access`, `date`, `time` and `error`.
 - Verifies `public_access` with an anonymous GET after publishing. It is not just set to `true` because the API call returned `200`.
 
-The five platforms are **Bluesky, Mastodon, Telegram, Dev.to and GitHub Gist**. I picked these because all five can publish text and give back a public URL without an app review.
+The five integrations are **Bluesky, Mastodon, Telegram, GitHub Issues and GitHub Gist**. I picked these because all five can publish text and give back a public URL without an app review or a paid plan. GitHub Issues and Gists are separate products with separate APIs and URL shapes, even though they share one token.
 
 If no credentials are configured, the endpoint returns `503 NO_PLATFORMS_CONFIGURED` and lists what is missing. It never invents a success.
 
@@ -121,7 +121,7 @@ Default reliability settings:
 | Bluesky | `createSession` → JWT | `bsky.app/profile/{handle}/post/{rkey}` | `BLUESKY_HANDLE`, `BLUESKY_APP_PASSWORD` |
 | Mastodon | Bearer token | `{instance}/@{user}/{id}` | `MASTODON_INSTANCE_URL`, `MASTODON_ACCESS_TOKEN` |
 | Telegram | Bot token, admin of a public channel | `t.me/{channel}/{message_id}` | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHANNEL` |
-| Dev.to | `api-key` header | `dev.to/{user}/{slug}` | `DEVTO_API_KEY` |
+| GitHub Issues | Bearer PAT | `github.com/{owner}/{repo}/issues/{number}` | `GITHUB_ISSUE_TOKEN` or `GITHUB_TOKEN`, `GITHUB_ISSUE_REPO` |
 | GitHub Gist | Fine-grained PAT | `gist.github.com/...` | `GITHUB_TOKEN` |
 
 Short version of each:
@@ -129,7 +129,7 @@ Short version of each:
 1. **Bluesky** — bsky.app → *Settings* → *App Passwords* → add one. Use an app password, not your account password. No approval needed.
 2. **Mastodon** — *Preferences* → *Development* → *New application*, scope `write:statuses`. Put the exact instance URL with `https://` in `MASTODON_INSTANCE_URL`.
 3. **Telegram** — `@BotFather` → `/newbot`. Make a **public** channel with a username, then add the bot as an administrator with *Post Messages*. `TELEGRAM_CHANNEL` accepts `@name`, `name` or `https://t.me/name`.
-4. **Dev.to** — *Settings* → *Extensions* → *DEV Community API Keys* → generate. Each article needs a unique CTA link because it is sent as the canonical URL. The adapter checks the article after creation and force-publishes it if DEV.to quietly saves it as a draft.
+4. **GitHub Issues** — use a fine-grained PAT with **Issues: read and write** on a public `owner/repo`. Put it in `GITHUB_ISSUE_TOKEN`; the app falls back to `GITHUB_TOKEN` if that is unset. Set `GITHUB_ISSUE_REPO` to the public repo. Each request creates one public issue.
 5. **GitHub Gist** — *Settings* → *Developer settings* → *Personal access tokens* → **fine-grained**, with **Account permissions → Gists: read and write**.
 
 I did not add more platforms for the sake of a bigger number. Medium shut down its public write API; Threads, Pinterest and Facebook need app review; Slack and Discord posts are not publicly readable; Buffer and Ayrshare are aggregators, not direct integrations.
@@ -183,40 +183,40 @@ Trailing punctuation is stripped, so `(https://example.com).` is read as `https:
 
 ## Proof from a real run
 
-This was an actual `POST /posting` call against the five configured accounts, not a fixture. Full response: [`docs/sample_responses/live-run.json`](docs/sample_responses/live-run.json).
+This was an actual `POST /posting` call against the five configured accounts, not a fixture. Full response: [`docs/sample_responses/live-run.json`](docs/sample_responses/live-run.json). Server log: [`docs/logs/live-run.log`](docs/logs/live-run.log).
 
 ```
 HTTP 200
 success: true
-summary: 5 total / 5 succeeded / 0 failed / 2314 ms / 0 unavailable
+summary: 5 total / 5 succeeded / 0 failed / 2302 ms / 0 unavailable
 ```
 
 | Platform | Status | URL | public_access |
 |---|---|---|---|
-| Bluesky | success | https://bsky.app/profile/aggarwalkrish28.bsky.social/post/3n2ixqpgxq22f | true, verified |
-| Mastodon | success | https://mastodon.social/@aggarwalkrish28/117631609179418319 | true, verified |
-| Telegram | success | https://t.me/aggarchannel/5 | true, verified |
-| Dev.to | success | https://dev.to/krish_aggarwal_6e08a24f75/final-five-platform-verification-run-2932 | true, verified |
-| GitHub Gist | success | https://gist.github.com/powerxranger/efe18d15fc21cf8fcd905690bd452ae7 | true, verified |
+| Bluesky | success | https://bsky.app/profile/aggarwalkrish28.bsky.social/post/3n2jj5tax732g | true, verified |
+| Mastodon | success | https://mastodon.social/@aggarwalkrish28/117632834301725525 | true, verified |
+| Telegram | success | https://t.me/aggarchannel/10 | null (public channel; anonymous GET failed from this network) |
+| GitHub Issue | success | https://github.com/powerxranger/automated-multi-platform-posting/issues/1 | true, verified |
+| GitHub Gist | success | https://gist.github.com/powerxranger/78ee0992bef72b34aa784fed3bb15c16 | true, verified |
 
 Abridged response:
 
 ```json
 {
   "success": true,
-  "request_id": "0f055c3229f144498669f1fc63a3ad78",
-  "message": "Final five platform verification run https://example.com/final5-171510",
-  "summary": { "total": 5, "succeeded": 5, "failed": 0, "duration_ms": 2314, "platforms_unavailable": [] },
+  "request_id": "37be08950f2a4ea89e82789886aace50",
+  "message": "Final five platform run with GitHub Issues https://example.com/final5-github-issue-222644",
+  "summary": { "total": 5, "succeeded": 5, "failed": 0, "duration_ms": 2302, "platforms_unavailable": [] },
   "results": [
     {
-      "platform": "Telegram",
+      "platform": "GitHub Issue",
       "status": "success",
-      "posted_url": "https://t.me/aggarchannel/5",
+      "posted_url": "https://github.com/powerxranger/automated-multi-platform-posting/issues/1",
       "public_access": true,
       "date": "2026-11-17",
-      "time": "17:15:11",
+      "time": "22:26:45",
       "error": null,
-      "meta": { "http_status": 200, "latency_ms": 1263, "attempts": 1,
+      "meta": { "http_status": 201, "latency_ms": 1679, "attempts": 1,
                 "public_access_verified": true, "timezone": "Asia/Kolkata" }
     }
   ],
@@ -256,15 +256,15 @@ pytest --cov=app --cov-report=term-missing
 ```
 
 ```
-101 passed
-TOTAL   867 statements   42 missed   93% coverage
+102 passed
+TOTAL   830 statements   36 missed   94% coverage
 ```
 
 The suite makes no network calls. `httpx.MockTransport` stands in for every API.
 
 - **Validation (25):** 200 vs 201 characters, zero/one/two links, duplicate links, `ftp://`, localhost, private IPs, missing TLD, embedded credentials, bad port, trailing punctuation, unicode, title derivation.
 - **Orchestration (16):** all succeed, one fails while the rest still publish, all fail, unavailable platforms, `ENABLED_PLATFORMS`, retryable vs non-retryable errors, retry counting, timeout isolation, real parallelism, idempotency replay, public-access verification.
-- **Adapters (27):** request payload shape per platform, including Bluesky's UTF-8 byte offsets, URL construction, `401/403/404/422/429/500` mapping, `Retry-After`, timeouts, non-JSON replies, Telegram `ok:false` and `t.me/` URLs, and the Dev.to draft → force-publish → public-URL check.
+- **Adapters (28):** request payload shape per platform, including Bluesky's UTF-8 byte offsets, URL construction, `401/403/404/422/429/500` mapping, `Retry-After`, timeouts, non-JSON replies, Telegram `ok:false` and `t.me/` URLs, and GitHub Issue URL/repo validation.
 - **HTTP contract (22):** status codes, error envelope, `extra_forbidden`, malformed JSON, `X-Request-ID` echo, 404 envelope, OpenAPI content, no credentials in responses.
 - **Security and public access (11):** token redaction in logs, errors and responses; anonymous GET login-wall detection.
 
@@ -315,7 +315,8 @@ Response-level codes: `VALIDATION_ERROR` (`422`), `NO_PLATFORMS_CONFIGURED` (`50
 - **No persistence.** Idempotency keys live in memory, so a restart forgets them and there is no post history. A production version would use Redis or DynamoDB plus a `posting_events` table.
 - **No queue.** The caller waits for the slowest platform. A production version would enqueue per-platform jobs and return `202` with a status URL.
 - **No circuit breaker.** A consistently failing platform still costs one attempt per request.
-- **Dev.to canonical URLs must be unique**, so each post needs a different CTA link.
+- **GitHub Issues and Gists can use separate tokens.** `GITHUB_ISSUE_TOKEN` is optional; without it, Issues falls back to `GITHUB_TOKEN`. The APIs and public URLs are different.
+- **No LLM posting platform.** Chat/completion APIs generate text but do not return an anonymously readable public post URL, which this brief requires.
 - **No media, threads or scheduling.** The brief asked for text-only, single, immediate posts, so that is what this does.
 
 ---
@@ -333,13 +334,13 @@ app/
 ├── platforms/
 │   ├── base.py              # PlatformAdapter contract and HTTP helper
 │   ├── registry.py          # the five adapters, in result order
-│   └── bluesky.py · mastodon.py · telegram.py · devto.py · github_gist.py
+│   └── bluesky.py · mastodon.py · telegram.py · github_issue.py · github_gist.py
 └── services/
     ├── posting_service.py   # concurrency, timeouts, retries, idempotency
     ├── url_validator.py     # pure validation rules
     └── public_access.py     # anonymous reachability check
 
-tests/           99 tests, no network
+tests/           102 tests, no network
 scripts/         check_env.py · smoke_test.py
 docs/            postman_collection.json · sample_responses/ · screenshots/
 ```

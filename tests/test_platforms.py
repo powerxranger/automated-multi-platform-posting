@@ -11,8 +11,8 @@ from app.config import Settings
 from app.errors import ErrorCode, PlatformError
 from app.platforms.base import ParsedMessage
 from app.platforms.bluesky import BlueskyAdapter
-from app.platforms.devto import DevToAdapter
 from app.platforms.github_gist import GitHubGistAdapter
+from app.platforms.github_issue import GitHubIssueAdapter
 from app.platforms.mastodon import MastodonAdapter
 from app.platforms.telegram import TelegramAdapter
 from tests.conftest import make_client
@@ -155,75 +155,65 @@ async def test_telegram_accepts_a_t_me_url_in_settings(
     assert json.loads(calls[0].content)["chat_id"] == "@testchannel"
 
 
-# ----------------------------------------------------------------------- devto --
+# --------------------------------------------------------------- github issue --
 
 
-async def test_devto_sends_title_and_canonical_url(
+async def test_github_issue_creates_a_public_issue(
     settings: Settings, message: ParsedMessage
 ) -> None:
-    public_url = "https://dev.to/tester/post-abc"
+    client, calls = recording(
+        lambda request: httpx.Response(
+            201,
+            json={"html_url": "https://github.com/tester/repo/issues/12", "number": 12},
+        )
+    )
+    outcome = await GitHubIssueAdapter(settings, client).publish_once(message)
 
-    def handler(request: httpx.Request) -> httpx.Response:
-        if request.method == "POST":
-            return httpx.Response(201, json={"id": 1, "url": public_url})
-        if request.url.path == "/api/articles/1":
-            return httpx.Response(200, json={"id": 1, "url": public_url, "published": True})
-        return httpx.Response(200, text="<html>Published article</html>")
-
-    client, calls = recording(handler)
-    outcome = await DevToAdapter(settings, client).publish_once(message)
-
-    assert outcome.posted_url == public_url
+    assert outcome.posted_url == "https://github.com/tester/repo/issues/12"
+    assert calls[0].url.path == "/repos/tester/repo/issues"
+    assert calls[0].headers["authorization"] == "Bearer test-github-token-value"
     import json
 
-    article = json.loads(calls[0].content)["article"]
-    assert article["canonical_url"] == message.url
-    assert article["title"] == message.title
-    assert article["published"] is True
+    body = json.loads(calls[0].content)
+    assert body["title"] == message.title
+    assert body["body"] == message.text
 
 
-async def test_devto_force_publishes_a_draft(settings: Settings, message: ParsedMessage) -> None:
-    public_url = "https://dev.to/tester/post-draft"
-    state = {"published": False}
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        if request.method == "POST":
-            return httpx.Response(201, json={"id": 7, "url": public_url})
-        if request.method == "PUT":
-            state["published"] = True
-            return httpx.Response(200, json={"id": 7})
-        if request.url.path == "/api/articles/7":
-            return httpx.Response(
-                200, json={"id": 7, "url": public_url, "published": state["published"]}
-            )
-        return httpx.Response(200, text="<html>Published article</html>")
-
-    client, calls = recording(handler)
-    outcome = await DevToAdapter(settings, client).publish_once(message)
-
-    assert outcome.posted_url == public_url
-    put_calls = [call for call in calls if call.method == "PUT"]
-    assert len(put_calls) == 1
-    import json
-
-    assert json.loads(put_calls[0].content)["article"]["published"] is True
-
-
-async def test_devto_rejects_an_article_that_is_not_public(
+async def test_github_issue_uses_a_separate_token_when_set(
     settings: Settings, message: ParsedMessage
 ) -> None:
-    public_url = "https://dev.to/tester/post-missing"
+    override = Settings(
+        _env_file=None,
+        github_token="old-github-token-value",
+        github_issue_token="new-issue-token-value",
+        github_issue_repo="tester/repo",
+    )
+    client, calls = recording(
+        lambda request: httpx.Response(
+            201, json={"html_url": "https://github.com/tester/repo/issues/13", "number": 13}
+        )
+    )
+    await GitHubIssueAdapter(override, client).publish_once(message)
 
-    def handler(request: httpx.Request) -> httpx.Response:
-        if request.method == "POST":
-            return httpx.Response(201, json={"id": 9, "url": public_url})
-        if request.url.path == "/api/articles/9":
-            return httpx.Response(200, json={"id": 9, "url": public_url, "published": True})
-        return httpx.Response(404, text="404: Page Not Found")
+    assert calls[0].headers["authorization"] == "Bearer new-issue-token-value"
 
-    client = make_client(handler)
+
+async def test_github_issue_missing_url_is_an_error(
+    settings: Settings, message: ParsedMessage
+) -> None:
+    client = make_client(lambda request: httpx.Response(201, json={"number": 12}))
     with pytest.raises(PlatformError) as caught:
-        await DevToAdapter(settings, client).publish_once(message)
+        await GitHubIssueAdapter(settings, client).publish_once(message)
+    assert caught.value.code is ErrorCode.UNEXPECTED
+
+
+async def test_github_issue_rejects_a_bad_repo_format(
+    settings: Settings, message: ParsedMessage
+) -> None:
+    bad = Settings(_env_file=None, github_token="token", github_issue_repo="bad-format")
+    client = make_client(lambda request: httpx.Response(201, json={}))
+    with pytest.raises(PlatformError) as caught:
+        await GitHubIssueAdapter(bad, client).publish_once(message)
     assert caught.value.code is ErrorCode.UNEXPECTED
 
 
@@ -318,5 +308,5 @@ def test_adapters_are_configured_with_full_settings(
     assert BlueskyAdapter(settings, stub_client).is_configured()
     assert MastodonAdapter(settings, stub_client).is_configured()
     assert TelegramAdapter(settings, stub_client).is_configured()
-    assert DevToAdapter(settings, stub_client).is_configured()
+    assert GitHubIssueAdapter(settings, stub_client).is_configured()
     assert GitHubGistAdapter(settings, stub_client).is_configured()

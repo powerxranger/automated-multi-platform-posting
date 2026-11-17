@@ -12,8 +12,8 @@ import httpx
 from app.config import Settings
 from app.platforms.base import PlatformAdapter
 from app.platforms.bluesky import BlueskyAdapter
-from app.platforms.devto import DevToAdapter
 from app.platforms.github_gist import GitHubGistAdapter
+from app.platforms.github_issue import GitHubIssueAdapter
 from app.platforms.mastodon import MastodonAdapter
 from app.platforms.telegram import TelegramAdapter
 
@@ -22,7 +22,7 @@ ADAPTER_TYPES: tuple[type[PlatformAdapter], ...] = (
     BlueskyAdapter,
     MastodonAdapter,
     TelegramAdapter,
-    DevToAdapter,
+    GitHubIssueAdapter,
     GitHubGistAdapter,
 )
 
