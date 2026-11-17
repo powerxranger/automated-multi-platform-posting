@@ -27,7 +27,7 @@ _LOGIN_BODY_MARKERS = (
     "log in to continue",
     "please log in",
     "you must be logged in",
-    "join linkedin",
+    "join now to continue",
     "authwall",
     "enable javascript and cookies",
 )

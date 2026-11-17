@@ -13,12 +13,8 @@ from app.platforms.base import ParsedMessage
 from app.platforms.bluesky import BlueskyAdapter
 from app.platforms.devto import DevToAdapter
 from app.platforms.github_gist import GitHubGistAdapter
-from app.platforms.hashnode import HashnodeAdapter
-from app.platforms.linkedin import LinkedInAdapter
 from app.platforms.mastodon import MastodonAdapter
-from app.platforms.reddit import RedditAdapter
 from app.platforms.telegram import TelegramAdapter
-from app.platforms.x_twitter import XAdapter
 from tests.conftest import make_client
 
 
@@ -129,6 +125,36 @@ async def test_telegram_ok_false_is_a_rejection(settings: Settings, message: Par
     assert "chat not found" in caught.value.message
 
 
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        ("@testchannel", "@testchannel"),
+        ("testchannel", "@testchannel"),
+        ("https://t.me/testchannel", "@testchannel"),
+        ("https://t.me/testchannel/", "@testchannel"),
+        ("t.me/testchannel", "@testchannel"),
+        ("  @testchannel  ", "@testchannel"),
+    ],
+)
+def test_telegram_channel_normalisation(raw: str, expected: str) -> None:
+    assert TelegramAdapter.normalize_channel(raw) == expected
+
+
+async def test_telegram_accepts_a_t_me_url_in_settings(
+    settings: Settings, message: ParsedMessage
+) -> None:
+    from_url = settings.model_copy(update={"telegram_channel": "https://t.me/testchannel"})
+    client, calls = recording(
+        lambda request: httpx.Response(200, json={"ok": True, "result": {"message_id": 5}})
+    )
+    outcome = await TelegramAdapter(from_url, client).publish_once(message)
+
+    assert outcome.posted_url == "https://t.me/testchannel/5"
+    import json
+
+    assert json.loads(calls[0].content)["chat_id"] == "@testchannel"
+
+
 # ----------------------------------------------------------------------- devto --
 
 
@@ -166,112 +192,6 @@ async def test_gist_creates_public_gist(settings: Settings, message: ParsedMessa
     body = json.loads(calls[0].content)
     assert body["public"] is True
     assert "post.md" in body["files"]
-
-
-# -------------------------------------------------------------------- linkedin --
-
-
-async def test_linkedin_uses_restli_id_header(settings: Settings, message: ParsedMessage) -> None:
-    def handler(request: httpx.Request) -> httpx.Response:
-        return httpx.Response(201, headers={"x-restli-id": "urn:li:share:1234567890"})
-
-    client, calls = recording(handler)
-    outcome = await LinkedInAdapter(settings, client).publish_once(message)
-
-    assert outcome.posted_url == "https://www.linkedin.com/feed/update/urn:li:share:1234567890/"
-    assert calls[0].headers["linkedin-version"] == settings.linkedin_version
-    import json
-
-    assert json.loads(calls[0].content)["visibility"] == "PUBLIC"
-
-
-async def test_linkedin_missing_restli_id_is_an_error(
-    settings: Settings, message: ParsedMessage
-) -> None:
-    client = make_client(lambda request: httpx.Response(201))
-    with pytest.raises(PlatformError) as caught:
-        await LinkedInAdapter(settings, client).publish_once(message)
-    assert caught.value.code is ErrorCode.UNEXPECTED
-
-
-# --------------------------------------------------------------------------- x --
-
-
-async def test_x_signs_the_request_with_oauth1(settings: Settings, message: ParsedMessage) -> None:
-    client, calls = recording(
-        lambda request: httpx.Response(201, json={"data": {"id": "1900000000", "text": "hi"}})
-    )
-    outcome = await XAdapter(settings, client).publish_once(message)
-
-    assert outcome.posted_url == "https://x.com/i/web/status/1900000000"
-    authorization = calls[0].headers["authorization"]
-    assert authorization.startswith("OAuth ")
-    assert "oauth_signature=" in authorization
-    assert 'oauth_signature_method="HMAC-SHA1"' in authorization
-
-
-# ---------------------------------------------------------------------- reddit --
-
-
-async def test_reddit_fetches_token_then_submits(
-    settings: Settings, message: ParsedMessage
-) -> None:
-    def handler(request: httpx.Request) -> httpx.Response:
-        if "access_token" in request.url.path:
-            return httpx.Response(200, json={"access_token": "tok", "expires_in": 3600})
-        return httpx.Response(
-            200,
-            json={"json": {"errors": [], "data": {"url": "https://reddit.com/r/test/comments/x"}}},
-        )
-
-    client, calls = recording(handler)
-    adapter = RedditAdapter(settings, client)
-    outcome = await adapter.publish_once(message)
-
-    assert outcome.posted_url == "https://reddit.com/r/test/comments/x"
-    assert calls[1].headers["authorization"] == "bearer tok"
-    # The token is cached for the next publish.
-    await adapter.publish_once(message)
-    token_calls = [c for c in calls if "access_token" in c.url.path]
-    assert len(token_calls) == 1
-
-
-async def test_reddit_reports_submission_errors(settings: Settings, message: ParsedMessage) -> None:
-    def handler(request: httpx.Request) -> httpx.Response:
-        if "access_token" in request.url.path:
-            return httpx.Response(200, json={"access_token": "tok", "expires_in": 3600})
-        return httpx.Response(
-            200, json={"json": {"errors": [["SUBREDDIT_NOTALLOWED", "nope", "sr"]]}}
-        )
-
-    client = make_client(handler)
-    with pytest.raises(PlatformError) as caught:
-        await RedditAdapter(settings, client).publish_once(message)
-    assert caught.value.code is ErrorCode.PLATFORM_REJECTED
-
-
-# -------------------------------------------------------------------- hashnode --
-
-
-async def test_hashnode_publishes_via_graphql(settings: Settings, message: ParsedMessage) -> None:
-    client, calls = recording(
-        lambda request: httpx.Response(
-            200,
-            json={
-                "data": {
-                    "publishPost": {"post": {"id": "p1", "url": "https://blog.hashnode.dev/post"}}
-                }
-            },
-        )
-    )
-    outcome = await HashnodeAdapter(settings, client).publish_once(message)
-
-    assert outcome.posted_url == "https://blog.hashnode.dev/post"
-    import json
-
-    body = json.loads(calls[0].content)
-    assert "publishPost" in body["query"]
-    assert body["variables"]["input"]["publicationId"] == "publication-id"
 
 
 # --------------------------------------------------------------- error mapping --
@@ -348,7 +268,3 @@ def test_adapters_are_configured_with_full_settings(
     assert TelegramAdapter(settings, stub_client).is_configured()
     assert DevToAdapter(settings, stub_client).is_configured()
     assert GitHubGistAdapter(settings, stub_client).is_configured()
-    assert LinkedInAdapter(settings, stub_client).is_configured()
-    assert XAdapter(settings, stub_client).is_configured()
-    assert RedditAdapter(settings, stub_client).is_configured()
-    assert HashnodeAdapter(settings, stub_client).is_configured()

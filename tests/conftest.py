@@ -33,19 +33,6 @@ def build_settings(**overrides: Any) -> Settings:
         "telegram_channel": "@testchannel",
         "devto_api_key": "devto-key-0123456789",
         "github_token": "test-github-token-value",
-        "linkedin_access_token": "linkedin-token-0123456789",
-        "linkedin_author_urn": "urn:li:person:abc123",
-        "x_api_key": "x-consumer-key",
-        "x_api_secret": "x-consumer-secret-0123456789",
-        "x_access_token": "x-access-token-0123456789",
-        "x_access_token_secret": "x-access-secret-0123456789",
-        "reddit_client_id": "reddit-client-id",
-        "reddit_client_secret": "reddit-client-secret-0123456789",
-        "reddit_username": "tester",
-        "reddit_password": "reddit-password-0123456789",
-        "reddit_subreddit": "test",
-        "hashnode_token": "hashnode-token-0123456789",
-        "hashnode_publication_id": "publication-id",
     }
     defaults.update(overrides)
     return Settings(_env_file=None, **defaults)

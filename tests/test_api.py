@@ -48,7 +48,7 @@ async def test_health(settings: Settings) -> None:
     assert response.status_code == 200
     body = response.json()
     assert body["status"] == "ok"
-    assert body["platforms_configured"] == 9
+    assert body["platforms_configured"] == 5
 
 
 async def test_root_points_at_docs(settings: Settings) -> None:
@@ -63,8 +63,8 @@ async def test_platforms_readiness(settings: Settings) -> None:
         response = await client.get("/platforms")
     assert response.status_code == 200
     body = response.json()
-    assert body["total"] == 9
-    assert body["configured"] == 9
+    assert body["total"] == 5
+    assert body["configured"] == 5
     assert {item["platform_id"] for item in body["platforms"]} >= {"bluesky", "telegram"}
 
 
@@ -202,7 +202,7 @@ async def test_posting_without_configured_platforms_returns_503() -> None:
     assert response.status_code == 503
     body = response.json()
     assert body["error"]["code"] == "NO_PLATFORMS_CONFIGURED"
-    assert len(body["error"]["fields"]) == 9
+    assert len(body["error"]["fields"]) == 5
 
 
 async def test_idempotency_header_replays(settings: Settings) -> None:

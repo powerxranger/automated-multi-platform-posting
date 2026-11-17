@@ -17,14 +17,34 @@ class TelegramAdapter(PlatformAdapter):
     platform_name = "Telegram"
     required_settings = ("TELEGRAM_BOT_TOKEN", "TELEGRAM_CHANNEL")
 
+    #: Accept `@name`, `name`, `t.me/name` and `https://t.me/name`.
+    _URL_PREFIXES = (
+        "https://t.me/",
+        "http://t.me/",
+        "https://telegram.me/",
+        "http://telegram.me/",
+        "t.me/",
+        "telegram.me/",
+    )
+
     def is_configured(self) -> bool:
         return not self.missing_settings()
 
+    @classmethod
+    def normalize_channel(cls, raw: str) -> str:
+        """Return the channel as `@username` (Telegram rejects URLs/titles)."""
+        value = raw.strip().rstrip("/")
+        lowered = value.lower()
+        for prefix in cls._URL_PREFIXES:
+            if lowered.startswith(prefix):
+                value = value[len(prefix) :]
+                break
+        value = value.lstrip("@").rstrip("/")
+        return f"@{value}" if value else ""
+
     async def publish_once(self, message: ParsedMessage) -> PublishOutcome:
         token = self.settings.telegram_bot_token
-        channel = str(self.settings.telegram_channel or "").strip()
-        if not channel.startswith("@"):
-            channel = f"@{channel.lstrip('@')}"
+        channel = self.normalize_channel(str(self.settings.telegram_channel or ""))
 
         response = await self.send(
             "POST",

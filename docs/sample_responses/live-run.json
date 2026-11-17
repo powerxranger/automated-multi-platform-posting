@@ -1,0 +1,105 @@
+{
+  "success": true,
+  "request_id": "0f055c3229f144498669f1fc63a3ad78",
+  "message": "Final five platform verification run https://example.com/final5-171510",
+  "summary": {
+    "total": 5,
+    "succeeded": 5,
+    "failed": 0,
+    "duration_ms": 2314,
+    "platforms_unavailable": []
+  },
+  "results": [
+    {
+      "platform": "Bluesky",
+      "status": "success",
+      "posted_url": "https://bsky.app/profile/aggarwalkrish28.bsky.social/post/3n2ixqpgxq22f",
+      "public_access": true,
+      "date": "2026-11-17",
+      "time": "17:15:12",
+      "error": null,
+      "meta": {
+        "http_status": 200,
+        "latency_ms": 2314,
+        "attempts": 1,
+        "public_access_verified": true,
+        "timezone": "Asia/Kolkata",
+        "post_id": "at://did:plc:4vyinmsljzsvnyjq2awbkn2c/app.bsky.feed.post/3n2ixqpgxq22f",
+        "checked_at_utc": "2026-11-17T11:45:13+00:00"
+      }
+    },
+    {
+      "platform": "Mastodon",
+      "status": "success",
+      "posted_url": "https://mastodon.social/@aggarwalkrish28/117631609179418319",
+      "public_access": true,
+      "date": "2026-11-17",
+      "time": "17:15:11",
+      "error": null,
+      "meta": {
+        "http_status": 200,
+        "latency_ms": 1512,
+        "attempts": 1,
+        "public_access_verified": true,
+        "timezone": "Asia/Kolkata",
+        "post_id": "117631609179418319",
+        "checked_at_utc": "2026-11-17T11:45:12+00:00"
+      }
+    },
+    {
+      "platform": "Telegram",
+      "status": "success",
+      "posted_url": "https://t.me/aggarchannel/5",
+      "public_access": true,
+      "date": "2026-11-17",
+      "time": "17:15:11",
+      "error": null,
+      "meta": {
+        "http_status": 200,
+        "latency_ms": 1263,
+        "attempts": 1,
+        "public_access_verified": true,
+        "timezone": "Asia/Kolkata",
+        "post_id": "5",
+        "checked_at_utc": "2026-11-17T11:45:12+00:00"
+      }
+    },
+    {
+      "platform": "Dev.to",
+      "status": "success",
+      "posted_url": "https://dev.to/krish_aggarwal_6e08a24f75/final-five-platform-verification-run-2932",
+      "public_access": true,
+      "date": "2026-11-17",
+      "time": "17:15:11",
+      "error": null,
+      "meta": {
+        "http_status": 201,
+        "latency_ms": 863,
+        "attempts": 1,
+        "public_access_verified": true,
+        "timezone": "Asia/Kolkata",
+        "post_id": "5056864",
+        "checked_at_utc": "2026-11-17T11:45:11+00:00"
+      }
+    },
+    {
+      "platform": "GitHub Gist",
+      "status": "success",
+      "posted_url": "https://gist.github.com/powerxranger/efe18d15fc21cf8fcd905690bd452ae7",
+      "public_access": true,
+      "date": "2026-11-17",
+      "time": "17:15:12",
+      "error": null,
+      "meta": {
+        "http_status": 201,
+        "latency_ms": 2173,
+        "attempts": 1,
+        "public_access_verified": true,
+        "timezone": "Asia/Kolkata",
+        "post_id": "efe18d15fc21cf8fcd905690bd452ae7",
+        "checked_at_utc": "2026-11-17T11:45:13+00:00"
+      }
+    }
+  ],
+  "replayed": false
+}

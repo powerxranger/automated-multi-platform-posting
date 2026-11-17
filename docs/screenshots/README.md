@@ -14,10 +14,9 @@ Screenshots and captured logs that prove the integrations are real belong here.
 | `06-telegram.png` | The published message in the public channel |
 | `07-devto.png` | The published Dev.to article |
 | `08-gist.png` | The public gist |
-| `09-linkedin.png` | The published LinkedIn post |
-| `10-partial-failure.png` | One platform deliberately misconfigured, others still succeeding |
-| `11-tests.png` | `pytest --cov=app` output (all green, coverage percentage visible) |
-| `12-ci.png` | Green GitHub Actions run |
+| `09-partial-failure.png` | One platform deliberately misconfigured, others still succeeding |
+| `10-tests.png` | `pytest --cov=app` output (all green, coverage percentage visible) |
+| `11-ci.png` | Green GitHub Actions run |
 
 ## Rules
 

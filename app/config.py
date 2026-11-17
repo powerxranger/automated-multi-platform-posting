@@ -18,10 +18,6 @@ PLATFORM_IDS: tuple[str, ...] = (
     "telegram",
     "devto",
     "gist",
-    "linkedin",
-    "x",
-    "reddit",
-    "hashnode",
 )
 
 
@@ -83,29 +79,6 @@ class Settings(BaseSettings):
     github_token: str | None = None
     github_gist_public: bool = True
 
-    # ------------------------------------------------------------- linkedin --
-    linkedin_access_token: str | None = None
-    linkedin_author_urn: str | None = None
-    linkedin_version: str = "202411"
-
-    # -------------------------------------------------------------------- x --
-    x_api_key: str | None = None
-    x_api_secret: str | None = None
-    x_access_token: str | None = None
-    x_access_token_secret: str | None = None
-
-    # --------------------------------------------------------------- reddit --
-    reddit_client_id: str | None = None
-    reddit_client_secret: str | None = None
-    reddit_username: str | None = None
-    reddit_password: str | None = None
-    reddit_subreddit: str | None = None
-    reddit_user_agent: str = "python:automated-posting:v1.0 (by /u/unknown)"
-
-    # ------------------------------------------------------------- hashnode --
-    hashnode_token: str | None = None
-    hashnode_publication_id: str | None = None
-
     # ------------------------------------------------------------- helpers ---
     @property
     def enabled_platform_ids(self) -> set[str] | None:
@@ -128,13 +101,6 @@ class Settings(BaseSettings):
             self.telegram_bot_token,
             self.devto_api_key,
             self.github_token,
-            self.linkedin_access_token,
-            self.x_api_secret,
-            self.x_access_token,
-            self.x_access_token_secret,
-            self.reddit_client_secret,
-            self.reddit_password,
-            self.hashnode_token,
         ]
         return [value for value in candidates if value and len(value) >= 6]
 
